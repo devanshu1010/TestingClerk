@@ -14,12 +14,17 @@ export async function POST(req: Request) {
       "Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local"
     );
   }
+  console.log("verified webhook");
+  
 
   // Get the headers
   const headerPayload = headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
+
+  console.log("got headers");
+  
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
@@ -28,9 +33,14 @@ export async function POST(req: Request) {
     });
   }
 
+  console.log("verified headers");
+  
   // Get the body
   const payload = await req.json();
+  console.log("payload data :",payload);
   const body = JSON.stringify(payload);
+  
+  console.log("body data :",body);
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -44,16 +54,23 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
+    console.log("success");
+    
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
       status: 400,
     });
   }
+  console.log("verified");
+  
 
   // Get the ID and type
   const { id } = evt.data;
   const eventType = evt.type;
+
+  console.log("event type ",eventType);
+  
 
   // CREATE User in mongodb
   if (eventType === "user.created") {
