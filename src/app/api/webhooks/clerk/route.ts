@@ -90,14 +90,22 @@ export async function POST(req: Request) {
 
     const newUser = await createUser(user);
 
+    console.log("new user:" , newUser);
+    
+
     if (newUser) {
+      console.log("inside if");
+      
       await clerkClient.users.updateUserMetadata(id, {
         publicMetadata: {
           userId: newUser._id,
         },
       });
+      console.log("if completed");
+      
     }
-
+    console.log("new user created ");
+    
     return NextResponse.json({ message: "New user created", user: newUser });
   }
 
